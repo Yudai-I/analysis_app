@@ -20,6 +20,7 @@ class ReviewsController < ApplicationController
           break
         end
       end
+      @contents.map! { |html| strip_html_tags(html) }
     end
 
     def new
@@ -45,5 +46,12 @@ class ReviewsController < ApplicationController
 
     def review_params
       params.require(:review).permit(:review)
+    end
+
+    private
+
+    # HTML タグを取り除いてテキストに変換する関数
+    def strip_html_tags(html)
+      Nokogiri::HTML.fragment(html).text
     end
 end
