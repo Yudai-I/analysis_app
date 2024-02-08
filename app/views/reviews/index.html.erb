@@ -1,3 +1,8 @@
 <% @contents.each do |review| %>
 <div><%= review %></div>
 <% end %>
+
+<%= form_with url: reviews_path, local: true, method: :get do |f| %>
+<%= f.text_field :url %>
+<%= f.submit "分析する" %>
+<% end %>
