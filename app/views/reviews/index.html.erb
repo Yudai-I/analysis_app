@@ -1,5 +1,7 @@
+<% if @contents.present? %>
 <% @contents.each do |review| %>
 <div><%= review %></div>
+<% end %>
 <% end %>
 
 <%= form_with url: reviews_path, local: true, method: :get do |f| %>
