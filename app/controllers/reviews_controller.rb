@@ -1,5 +1,7 @@
 require 'nokogiri'
 require 'open-uri'
+require 'net/http'
+require 'json'
 
 class ReviewsController < ApplicationController
     def index
@@ -7,6 +9,8 @@ class ReviewsController < ApplicationController
       if params[:url].present?
         get_data
       end
+
+      @api = get_goo_api
     end
 
     def new
@@ -64,6 +68,30 @@ class ReviewsController < ApplicationController
         end
       end
       @contents.map! { |html| strip_html_tags(html) }
+    end
+
+    def get_goo_api
+      url = URI.parse('https://labs.goo.ne.jp/api/morph')
+      app_id = ENV['goo_key']
+      request_id = 'record001'
+      sentence = '私は野球をする'
+      info_filter = 'form' # 表記のみ取得する
+
+      body = {
+      app_id: app_id,
+      request_id: request_id,
+      sentence: sentence,
+      info_filter: info_filter
+      }
+
+      response = Net::HTTP.post(url, body.to_json, 'Content-Type' => 'application/json')
+      result = JSON.parse(response.body)
+      word_list = result['word_list']
+      word_list.each do |sentence|
+        sentence.each do |word|
+          puts word.first
+        end
+      end
     end
 
 end
