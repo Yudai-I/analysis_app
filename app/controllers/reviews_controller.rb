@@ -9,7 +9,7 @@ class ReviewsController < ApplicationController
       if params[:url].present?
         @sentence = get_data.join
         @api = get_goo_api(@sentence)
-        @api = remove_hiragana_emoji_symbol_words(@api)
+        @api = remove_hiragana_emoji_symbol_words(@api).join[0,500]
       end 
     end
 
@@ -56,7 +56,8 @@ class ReviewsController < ApplicationController
         str.match?(/\A[\p{hiragana}]{1,2}\z/)
       end
     end
-
+    
+    #レビュー文１つ１つを要素とした１次元配列を返す
     def get_data
       @contents = []
       n = 1
@@ -79,6 +80,7 @@ class ReviewsController < ApplicationController
       return @contents
     end
 
+    #形態素解析し得た文字列を要素とする1次元配列を返す
     def get_goo_api(sentence)
       url = URI.parse('https://labs.goo.ne.jp/api/morph')
       app_id = ENV['goo_key']
@@ -95,7 +97,7 @@ class ReviewsController < ApplicationController
       response = Net::HTTP.post(url, body.to_json, 'Content-Type' => 'application/json')
       result = JSON.parse(response.body)
       word_list = result['word_list']
-      # flattenは2次元配列を1次元配列にするメソッド(データを扱いやすいように)
+      #flattenは2次元配列を1次元配列にするメソッド(データを扱いやすいように)
       return word_list.flatten
     end
 
