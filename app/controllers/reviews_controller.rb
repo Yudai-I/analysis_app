@@ -9,6 +9,7 @@ class ReviewsController < ApplicationController
       if params[:url].present?
         @sentence = get_data.join
         @api = get_goo_api(@sentence)
+        @api = remove_hiragana_emoji_symbol_words(@api)
       end 
     end
 
@@ -46,6 +47,14 @@ class ReviewsController < ApplicationController
 
     def formatting_url(url, n)
       url.sub(/pageNumber=\d+/, "pageNumber=#{n}")
+    end
+
+    #分析にほぼ不要なひらがな２文字以下、絵文字、記号の要素を削除する
+    def remove_hiragana_emoji_symbol_words(array)
+      array.reject! do |str|
+        str.match?(/[^\p{Han}\p{Hiragana}\p{Katakana}\p{Alnum}\s]/) ||
+        str.match?(/\A[\p{hiragana}]{1,2}\z/)
+      end
     end
 
     def get_data
@@ -86,7 +95,7 @@ class ReviewsController < ApplicationController
       response = Net::HTTP.post(url, body.to_json, 'Content-Type' => 'application/json')
       result = JSON.parse(response.body)
       word_list = result['word_list']
-      # flattenは2次元配列を1次元配列にするメソッド
+      # flattenは2次元配列を1次元配列にするメソッド(データを扱いやすいように)
       return word_list.flatten
     end
 
