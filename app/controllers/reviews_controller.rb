@@ -7,7 +7,7 @@ require_relative '../services/chat_gpt_service'
 
 class ReviewsController < ApplicationController
     def index
-      @url = params[:url]  
+      @url = params[:url]
       if @url.present?
         @sentence = get_data.join
         @api = get_goo_api(@sentence)
@@ -15,6 +15,7 @@ class ReviewsController < ApplicationController
         prompt = "#{@api}+下記のレビューにおいて、ユーザーがよかった思うこと、失敗したことは何ですか？"
         chatgpt = ChatGptService.new
         @ans = chatgpt.chat(prompt)
+        @product = extract_product_name(@url)
       end
     end
 
@@ -48,6 +49,15 @@ class ReviewsController < ApplicationController
 
     def formatting_url(url, n)
       url.sub(/pageNumber=\d+/, "pageNumber=#{n}")
+    end
+
+    # ユーザーが入力したurlから商品名を抜き出すメソッド
+    def extract_product_name(url)
+      url = url.split("/")
+      idx_amazon = url.index("www.amazon.co.jp")
+      encoded_string = url[idx_amazon + 1]
+      product_name = URI.decode_www_form_component(encoded_string)
+      return product_name
     end
 
     #分析にほぼ不要なひらがな２文字以下、絵文字、記号の要素を削除する
