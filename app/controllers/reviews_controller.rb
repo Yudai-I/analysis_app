@@ -7,16 +7,22 @@ require_relative '../services/chat_gpt_service'
 
 class ReviewsController < ApplicationController
     def index
-      @url = params[:url]
-      if @url.present?
-        @sentence = scrape_data.join
+      url = params[:url]
+      if url.present?
+        all_views_url = move_to_nexe_page(url,'#reviews-medley-footer > div.a-row.a-spacing-medium > a')
+        url_for_next_page = move_to_nexe_page(all_views_url,'#cm_cr-pagination_bar > ul > li.a-last > a')
+        formated_url = remove_unnecessary_literal(url_for_next_page)
+      end
+
+      if formated_url.present?
+        @sentence = scrape_data(formated_url).join
         @api = get_morphological_analysis(@sentence)
         # joinする文字数はいったん600(長すぎるとエラー)
         @api = remove_hiragana_emoji_symbol_words(@api).join[0,600]
         prompt = "#{@api}+下記のレビューにおいて、ユーザーがよかった思うこと、失敗したことは何ですか？"
         chatgpt = ChatGptService.new
         @ans = chatgpt.chat(prompt)
-        @product = extract_product_name(@url)
+        @product = extract_product_name(formated_url)
       end
     end
 
@@ -48,6 +54,11 @@ class ReviewsController < ApplicationController
       Nokogiri::HTML.fragment(html).text
     end
 
+    def remove_unnecessary_literal(url)
+      return url.gsub("&reviewerType=all_reviews", "")
+    end
+
+    # 次のページに遷移するために必要なメソッド
     def formatting_url(url, n)
       url.sub(/pageNumber=\d+/, "pageNumber=#{n}")
     end
@@ -69,13 +80,22 @@ class ReviewsController < ApplicationController
       end
     end
     
+    def move_to_nexe_page(url,selector)
+      ##reviews-medley-footer > div.a-row.a-spacing-medium > a(すべて表示)
+      ##cm_cr-pagination_bar > ul > li.a-last > a(二ページ目表示)
+      user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36"
+      html = URI.open(url, "User-Agent" => user_agent).read
+      doc = Nokogiri::HTML(html)
+      link = doc.css(selector).attr('href').value
+      proper_link = "https://www.amazon.co.jp/#{link}"
+    end
+
     #レビュー文１つ１つを要素とした１次元配列を返す
-    def scrape_data
+    def scrape_data(url)
       @contents = []
       n = 1
-      user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.112 Safari/537.3"
+      user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.115 Safari/537.3"
       while true do
-        url = params[:url]
         formated_url = formatting_url(url, n)
         begin
           html = URI.open(formated_url, "User-Agent" => user_agent).read
