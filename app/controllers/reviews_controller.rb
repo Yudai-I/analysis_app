@@ -7,10 +7,9 @@ class ReviewsController < ApplicationController
     def index
       @reviews = Review.all
       if params[:url].present?
-        get_data
-      end
-
-      @api = get_goo_api
+        @sentence = get_data.join
+        @api = get_goo_api(@sentence)
+      end 
     end
 
     def new
@@ -52,7 +51,7 @@ class ReviewsController < ApplicationController
     def get_data
       @contents = []
       n = 1
-      user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.111 Safari/537.3"
+      user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
       while true do
         url = params[:url]
         formated_url = formatting_url(url, n)
@@ -68,14 +67,14 @@ class ReviewsController < ApplicationController
         end
       end
       @contents.map! { |html| strip_html_tags(html) }
+      return @contents
     end
 
-    def get_goo_api
+    def get_goo_api(sentence)
       url = URI.parse('https://labs.goo.ne.jp/api/morph')
       app_id = ENV['goo_key']
       request_id = 'record001'
-      sentence = '私は野球をする'
-      info_filter = 'form' # 表記のみ取得する
+      info_filter = 'form'
 
       body = {
       app_id: app_id,
@@ -87,11 +86,7 @@ class ReviewsController < ApplicationController
       response = Net::HTTP.post(url, body.to_json, 'Content-Type' => 'application/json')
       result = JSON.parse(response.body)
       word_list = result['word_list']
-      word_list.each do |sentence|
-        sentence.each do |word|
-          puts word.first
-        end
-      end
+      return word_list
     end
 
 end
