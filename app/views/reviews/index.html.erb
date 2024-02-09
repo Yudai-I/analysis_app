@@ -1,4 +1,4 @@
-<%= @product %>
+<div>商品名：<%= @product %></div>
 <%= @ans %>
 <%= form_with url: reviews_path, local: true, method: :get do |f| %>
 <%= f.text_field :url %>

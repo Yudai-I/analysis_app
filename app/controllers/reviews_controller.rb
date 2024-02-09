@@ -9,9 +9,10 @@ class ReviewsController < ApplicationController
     def index
       @url = params[:url]
       if @url.present?
-        @sentence = get_data.join
-        @api = get_goo_api(@sentence)
-        @api = remove_hiragana_emoji_symbol_words(@api).join[0,500]
+        @sentence = scrape_data.join
+        @api = get_morphological_analysis(@sentence)
+        # joinする文字数はいったん600(長すぎるとエラー)
+        @api = remove_hiragana_emoji_symbol_words(@api).join[0,600]
         prompt = "#{@api}+下記のレビューにおいて、ユーザーがよかった思うこと、失敗したことは何ですか？"
         chatgpt = ChatGptService.new
         @ans = chatgpt.chat(prompt)
@@ -69,7 +70,7 @@ class ReviewsController < ApplicationController
     end
     
     #レビュー文１つ１つを要素とした１次元配列を返す
-    def get_data
+    def scrape_data
       @contents = []
       n = 1
       user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.112 Safari/537.3"
@@ -92,7 +93,7 @@ class ReviewsController < ApplicationController
     end
 
     #形態素解析し得た文字列を要素とする1次元配列を返す
-    def get_goo_api(sentence)
+    def get_morphological_analysis(sentence)
       url = URI.parse('https://labs.goo.ne.jp/api/morph')
       app_id = ENV['goo_key']
       request_id = 'record001'
