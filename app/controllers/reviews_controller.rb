@@ -86,7 +86,8 @@ class ReviewsController < ApplicationController
       response = Net::HTTP.post(url, body.to_json, 'Content-Type' => 'application/json')
       result = JSON.parse(response.body)
       word_list = result['word_list']
-      return word_list
+      # flattenは2次元配列を1次元配列にするメソッド
+      return word_list.flatten
     end
 
 end
