@@ -5,16 +5,12 @@ require 'json'
 
 class ReviewsController < ApplicationController
     def index
-      @reviews = Review.all
-      if params[:url].present?
+      @url = params[:url]
+      if @url.present?
         @sentence = get_data.join
         @api = get_goo_api(@sentence)
         @api = remove_hiragana_emoji_symbol_words(@api).join[0,500]
-      end 
-    end
-
-    def new
-      @review = Review.new
+      end
     end
 
     def create
