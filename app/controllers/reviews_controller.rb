@@ -2,14 +2,19 @@ require 'nokogiri'
 require 'open-uri'
 require 'net/http'
 require 'json'
+require 'uri'
+require_relative '../services/chat_gpt_service'
 
 class ReviewsController < ApplicationController
     def index
-      @url = params[:url]
+      @url = params[:url]  
       if @url.present?
         @sentence = get_data.join
         @api = get_goo_api(@sentence)
         @api = remove_hiragana_emoji_symbol_words(@api).join[0,500]
+        prompt = "#{@api}+下記のレビューにおいて、ユーザーがよかった思うこと、失敗したことは何ですか？"
+        chatgpt = ChatGptService.new
+        @ans = chatgpt.chat(prompt)
       end
     end
 
@@ -36,7 +41,7 @@ class ReviewsController < ApplicationController
 
     private
 
-    # HTML タグを取り除いてテキストに変換する関数
+    # HTMLタグを取り除いてテキストに変換する関数
     def strip_html_tags(html)
       Nokogiri::HTML.fragment(html).text
     end
@@ -57,7 +62,7 @@ class ReviewsController < ApplicationController
     def get_data
       @contents = []
       n = 1
-      user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+      user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.112 Safari/537.3"
       while true do
         url = params[:url]
         formated_url = formatting_url(url, n)
