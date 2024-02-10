@@ -11,18 +11,18 @@ class ReviewsController < ApplicationController
       if url.present?
         all_views_url = move_to_nexe_page(url,'#reviews-medley-footer > div.a-row.a-spacing-medium > a')
         url_for_next_page = move_to_nexe_page(all_views_url,'#cm_cr-pagination_bar > ul > li.a-last > a')
-        formated_url = remove_unnecessary_literal(url_for_next_page)
+        @formated_url = remove_unnecessary_literal(url_for_next_page)
       end
 
-      if formated_url.present?
-        @sentence = scrape_data(formated_url).join
+      if @formated_url.present?
+        @sentence = scrape_data(@formated_url).join
         @api = get_morphological_analysis(@sentence)
         # joinする文字数はいったん600(長すぎるとエラー)
         @api = remove_hiragana_emoji_symbol_words(@api).join[0,600]
         prompt = "#{@api}+下記のレビューにおいて、ユーザーがよかった思うこと、失敗したことは何ですか？"
         chatgpt = ChatGptService.new
         @ans = chatgpt.chat(prompt)
-        @product = extract_product_name(formated_url)
+        @product = extract_product_name(@formated_url)
       end
     end
 
@@ -67,7 +67,7 @@ class ReviewsController < ApplicationController
     def extract_product_name(url)
       url = url.split("/")
       idx_amazon = url.index("www.amazon.co.jp")
-      encoded_string = url[idx_amazon + 1]
+      encoded_string = url[idx_amazon + 2]
       product_name = URI.decode_www_form_component(encoded_string)
       return product_name
     end
