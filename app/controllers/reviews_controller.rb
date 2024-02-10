@@ -9,8 +9,8 @@ class ReviewsController < ApplicationController
     def index
       url = params[:url]
       if url.present?
-        all_views_url = move_to_nexe_page(url,'#reviews-medley-footer > div.a-row.a-spacing-medium > a')
-        url_for_next_page = move_to_nexe_page(all_views_url,'#cm_cr-pagination_bar > ul > li.a-last > a')
+        all_views_url = move_to_nexe_page1(url,'#reviews-medley-footer > div.a-row.a-spacing-medium > a')
+        url_for_next_page = move_to_nexe_page1(all_views_url,'#cm_cr-pagination_bar > ul > li.a-last > a')
         @formated_url = remove_unnecessary_literal(url_for_next_page)
       end
 
@@ -80,14 +80,44 @@ class ReviewsController < ApplicationController
       end
     end
     
-    def move_to_nexe_page(url,selector)
-      ##reviews-medley-footer > div.a-row.a-spacing-medium > a(すべて表示)
-      ##cm_cr-pagination_bar > ul > li.a-last > a(二ページ目表示)
-      user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36"
+    # 商品によって、cssセレクタが違うことがあるので、それの対処用で複数の類似メソッドを作成
+    def move_to_nexe_page1(url,selector)
+      user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4691.99 Safari/537.36"
       html = URI.open(url, "User-Agent" => user_agent).read
       doc = Nokogiri::HTML(html)
-      link = doc.css(selector).attr('href').value
-      proper_link = "https://www.amazon.co.jp/#{link}"
+      begin
+        link = doc.css(selector).attr('href').value
+        proper_link = "https://www.amazon.co.jp/#{link}"
+      rescue OpenURI::HTTPError,StandardError,Timeout::Error => e
+        proper_link = move_to_nexe_page2(url,'#cr-pagination-footer-0 > a')
+      end
+      return proper_link
+    end
+
+    def move_to_nexe_page2(url,selector)
+      user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4691.99 Safari/537.36"
+      html = URI.open(url, "User-Agent" => user_agent).read
+      doc = Nokogiri::HTML(html)
+      begin
+        link = doc.css(selector).attr('href').value
+        proper_link = "https://www.amazon.co.jp/#{link}"
+      rescue OpenURI::HTTPError,StandardError,Timeout::Error => e
+        proper_link = move_to_nexe_page3(url,'#cm_cr-pagination_bar > ul > li.a-last > a')
+      end
+      return proper_link
+    end
+
+    def move_to_nexe_page3(url,selector)
+      user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4691.99 Safari/537.36"
+      html = URI.open(url, "User-Agent" => user_agent).read
+      doc = Nokogiri::HTML(html)
+      begin
+        link = doc.css(selector).attr('href').value
+        proper_link = "https://www.amazon.co.jp/#{link}"
+      rescue OpenURI::HTTPError,StandardError,Timeout::Error => e
+        proper_link = "nothing"
+      end
+      return proper_link
     end
 
     #レビュー文１つ１つを要素とした１次元配列を返す
@@ -104,7 +134,7 @@ class ReviewsController < ApplicationController
           break if reviews.empty?
           @contents.concat(reviews)
           n += 1
-        rescue OpenURI::HTTPError, Timeout::Error => e
+        rescue OpenURI::HTTPError,StandardError,Timeout::Error => e
           break
         end
       end
