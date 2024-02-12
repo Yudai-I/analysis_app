@@ -72,5 +72,5 @@ group :test do
 end
 
 gem 'dotenv-rails'
-
 gem 'ruby-openai'
+gem 'webpacker', '~> 5.0'
