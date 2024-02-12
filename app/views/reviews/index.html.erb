@@ -2,7 +2,12 @@
 
 <%= @ans %>
 
-<%= form_with url: reviews_path, local: true, method: :get do |f| %>
-<%= f.text_field :url %>
-<%= f.submit "分析する" %>
+<%= form_with url: reviews_path, local: true, method: :get, class: "row g-3 align-items-center" do |f| %>
+  <div class="col-auto">
+    <%= f.text_field :url, class: "form-control", placeholder: "URLを入力してください" %>
+  </div>
+  <div class="col-auto">
+    <%= f.submit "分析する", class: "btn btn-outline-dark" %>
+  </div>
 <% end %>
+
