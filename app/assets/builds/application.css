@@ -4,6 +4,12 @@
  * Copyright 2011-2023 The Bootstrap Authors
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
+
+ .resized-image {
+  max-width: 200px; /* 画像の最大幅 */
+  max-height: 200px; /* 画像の最大高さ */
+}
+
 :root,
 [data-bs-theme=light] {
   --bs-blue: #0d6efd;

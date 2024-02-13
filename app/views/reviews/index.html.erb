@@ -1,5 +1,5 @@
 <div>商品名：<%= @product %></div>
-
+<%= @image_url %>
 <% if @ans.present? %>
 <%= form_with model: @review, local: true do |f| %>
 <%= f.text_area :review, value: @ans %>
