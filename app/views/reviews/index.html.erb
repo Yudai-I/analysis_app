@@ -1,6 +1,13 @@
 <div>商品名：<%= @product %></div>
 
-<%= @ans %>
+<% if @ans.present? %>
+<%= form_with model: @review, local: true do |f| %>
+<%= f.text_area :review, value: @ans %>
+<%= f.text_field :link, value: @url %>
+<%= f.text_field :product_name, value: @product %>
+<%= f.submit "マイページに追加", class: "btn btn-outline-dark" %>
+<% end %>
+<% end %>
 
 <%= form_with url: reviews_path, local: true, method: :get, class: "row g-3 align-items-center" do |f| %>
   <div class="col-auto">

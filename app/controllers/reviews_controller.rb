@@ -7,9 +7,10 @@ require_relative '../services/chat_gpt_service'
 
 class ReviewsController < ApplicationController
     def index
-      url = params[:url]
-      if url.present?
-        all_views_url = move_to_nexe_page1(url,'#reviews-medley-footer > div.a-row.a-spacing-medium > a')
+      @review = Review.new
+      @url = params[:url]
+      if @url.present?
+        all_views_url = move_to_nexe_page1(@url,'#reviews-medley-footer > div.a-row.a-spacing-medium > a')
         url_for_next_page = move_to_nexe_page1(all_views_url,'#cm_cr-pagination_bar > ul > li.a-last > a')
         @formated_url = remove_unnecessary_literal(url_for_next_page)
       end
@@ -19,7 +20,7 @@ class ReviewsController < ApplicationController
         @api = get_morphological_analysis(@sentence)
         # joinする文字数はいったん600(長すぎるとエラー)
         @api = remove_hiragana_emoji_symbol_words(@api).join[0,600]
-        prompt = "#{@api}+下記のレビューにおいて、ユーザーがよかった思うこと、失敗したことは何ですか？"
+        prompt = "下記のレビューにおいて、ユーザーがよかった思うこと、失敗したことは何か説明して##{@api}"
         chatgpt = ChatGptService.new
         @ans = chatgpt.chat(prompt)
         @product = extract_product_name(@formated_url)
@@ -28,6 +29,7 @@ class ReviewsController < ApplicationController
 
     def create
       @review = Review.new(review_params)
+      @review.user_id = current_user.id
       if @review.save
         redirect_to reviews_path
       else
@@ -44,7 +46,7 @@ class ReviewsController < ApplicationController
     private
 
     def review_params
-      params.require(:review).permit(:review)
+      params.require(:review).permit(:review, :link, :product_name)
     end
 
     private

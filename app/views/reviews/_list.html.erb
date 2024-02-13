@@ -11,7 +11,7 @@
   <tr>
 <td><%= link_to "#{review.product_name}", "#{review.link}" %></td>
 <td><%= review.review %></td>
-<% if book.user_id == current_user.id %>
+<% if review.user_id == current_user.id %>
 <td><%= link_to "Destroy", review_path(review), method: :delete, class: 'btn btn-danger' %></td>
 <% end %>
   </tr>
