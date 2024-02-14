@@ -10,6 +10,15 @@
   max-height: 200px; /* 画像の最大高さ */
 }
 
+.navbar-brand span {
+  margin-right: 120px;
+}
+
+.navbar-nav li {
+  margin-right: 40px; /* 任意のマージンサイズを指定 */
+  font-size: 22px;
+}
+
 :root,
 [data-bs-theme=light] {
   --bs-blue: #0d6efd;
