@@ -10,8 +10,10 @@ class ReviewsController < ApplicationController
       @review = Review.new
       @url = params[:url]
       if @url.present?
-        all_views_url = move_to_nexe_page1(@url,'#reviews-medley-footer > div.a-row.a-spacing-medium > a')
-        url_for_next_page = move_to_nexe_page1(all_views_url,'#cm_cr-pagination_bar > ul > li.a-last > a')
+        user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4691.99 Safari/537.36"
+        @image_url = get_image_url(@url, user_agent)
+        all_views_url = move_to_nexe_page1(@url,user_agent,'#reviews-medley-footer > div.a-row.a-spacing-medium > a')
+        url_for_next_page = move_to_nexe_page1(all_views_url,user_agent,'#cm_cr-pagination_bar > ul > li.a-last > a')
         @formated_url = remove_unnecessary_literal(url_for_next_page)
       end
 
@@ -83,8 +85,7 @@ class ReviewsController < ApplicationController
     end
     
     # 商品によって、cssセレクタが違うことがあるので、それの対処用で複数の類似メソッドを作成
-    def move_to_nexe_page1(url,selector)
-      user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4691.99 Safari/537.36"
+    def move_to_nexe_page1(url,user_agent,selector)
       html = URI.open(url, "User-Agent" => user_agent).read
       doc = Nokogiri::HTML(html)
       begin
@@ -96,8 +97,7 @@ class ReviewsController < ApplicationController
       return proper_link
     end
 
-    def move_to_nexe_page2(url,selector)
-      user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4691.99 Safari/537.36"
+    def move_to_nexe_page2(url,user_agent,selector)
       html = URI.open(url, "User-Agent" => user_agent).read
       doc = Nokogiri::HTML(html)
       begin
@@ -109,8 +109,7 @@ class ReviewsController < ApplicationController
       return proper_link
     end
 
-    def move_to_nexe_page3(url,selector)
-      user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4691.99 Safari/537.36"
+    def move_to_nexe_page3(url,user_agent,selector)
       html = URI.open(url, "User-Agent" => user_agent).read
       doc = Nokogiri::HTML(html)
       begin
@@ -120,6 +119,18 @@ class ReviewsController < ApplicationController
         proper_link = "nothing"
       end
       return proper_link
+    end
+
+    def get_image_url(url,user_agent)
+      begin
+        html = URI.open(url, "User-Agent" => user_agent).read
+        doc = Nokogiri::HTML(html)
+        image_tag = doc.at_css('#imgTagWrapperId img')
+        image_url = image_tag['src'] if image_tag
+      rescue OpenURI::HTTPError,StandardError,Timeout::Error => e
+        image_url = nil
+      end
+      return image_url
     end
 
     #レビュー文１つ１つを要素とした１次元配列を返す
