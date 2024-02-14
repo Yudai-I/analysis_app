@@ -1,10 +1,10 @@
 <div>商品名：<%= @product %></div>
-<%= @image_url %>
 <% if @ans.present? %>
 <%= form_with model: @review, local: true do |f| %>
 <%= f.text_area :review, value: @ans %>
 <%= f.text_field :link, value: @url %>
 <%= f.text_field :product_name, value: @product %>
+<%= f.text_area :image_url, value: @image_url %>
 <%= f.submit "マイページに追加", class: "btn btn-outline-dark" %>
 <% end %>
 <% end %>

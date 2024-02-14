@@ -1,15 +1,16 @@
 <table class="table table-Hoverable">
   <thead>
   <tr>
-  <th>product</th>
-  <th>review</th>
+  <th>商品画像</th>
+  <th>商品名</th>
+  <th>レビュー分析結果</th>
   <th></th>
   </tr>
 </thead>
 <tbody>
   <% reviews.each do |review| %>
   <tr>
-<td><img src="https://images-fe.ssl-images-amazon.com/images/I/81hpazZxMXL._AC_UL450_SR450,320_.jpg" alt="画像の説明" class="resized-image"></td>
+<td><img src=<%= review.image_url %> alt="画像の説明" class="resized-image"></td>
 <td><%= link_to "#{review.product_name}", "#{review.link}" %></td>
 <td><%= review.review %></td>
 <% if review.user_id == current_user.id %>
