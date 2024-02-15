@@ -5,23 +5,34 @@
 
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-xl">
+  <div class="modal-dialog modal-xl">
     <div class="modal-content">
-    
+
       <div class="modal-header">
         <h1 class="modal-title fs-5" id="exampleModalLabel">手順１</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-f
+      <%= link_to 'amazon公式ページ', 'https://www.amazon.co.jp/', target: :_blank, rel: "noopener noreferrer" %>にアクセスします。
       </div>
       
       <div class="modal-header">
         <h1 class="modal-title fs-5" id="exampleModalLabel">手順２</h1>
       </div>
       <div class="modal-body">
-f
+      <img src="/assets/guide1.png" alt="画像の説明" class="resized-image">
+      任意の商品画像を右クリックして「リンクのアドレスをコピー」でリンクをコピーします。
       </div>
+
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">手順３</h1>
+      </div>
+      <div class="modal-body">
+      <a href="gazou1.jpg" data-lightbox="group"><img src="/assets/guide2.png" alt="画像の説明" class="resized-image"></a>
+      「Analysis」ページにてテキストボックスにコピーしたリンクを貼り付けて「分析」ボタンを押します。しばらくすると結果が表示され、「マイページに追加」ボタンを押すと気になった商品情報を保存することができます。
+      </div>
+
+      
 
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
