@@ -1,18 +1,7 @@
 <div class="container">
   <div class="row d-flex justify-content-center align-items-center">
 
-    <% if @ans.present? %>
-    <div>商品名：<%= @product %></div>
-    <%= form_with model: @review, local: true do |f| %>
-    <%= f.text_area :review, value: @ans %>
-    <%= f.text_field :link, value: @url %>
-    <%= f.text_field :product_name, value: @product %>
-    <%= f.text_area :image_url, value: @image_url %>
-    <%= f.submit "マイページに追加", class: "btn btn-outline-dark" %>
-    <% end %>
-    <% end %>
-
-<div class="col-lg-12"> <!-- テキストフィールド用の列 -->
+<div class="col-md-12"> <!-- テキストフィールド用の列 -->
       <%= form_with url: reviews_path, local: true, method: :get do |f| %>
         <div class="form">
           <%= f.text_field :url, class: "form-control", placeholder: "URLを入力してください" %>
@@ -22,6 +11,36 @@
         </div>
         <% end %>
     </div>
-
+      </div>
+<% if @ans.present? %>
+<div class="row d-flex justify-content-center align-items-center">
+<div class="col-md-12">
+<table class="table table-Hoverable">
+<thead>
+<tr>
+<th>商品画像</th>
+<th>商品名</th>
+<th>分析結果</th>
+<tr>
+</thead>
+<tbody>
+<tr>
+<td><img src="<%= @image_url %>" alt="画像の説明" class="resized-image"></td>
+<td><%= @product %></td>
+<td><%= @ans %></td>
+</tr>
+</tbody>
+</table>
+      <div>
+        <%= form_with model: @review, local: true do |f| %>
+          <%= f.hidden_field :review, value: @ans %>
+          <%= f.hidden_field :link, value: @url %>
+          <%= f.hidden_field :product_name, value: @product %>
+          <%= f.hidden_field :image_url, value: @image_url %>
+          <%= f.submit "マイページに追加", class: "btn btn-outline-dark" %>
+        <% end %>
+    </div>
   </div>
+</div>
+<% end %>
 </div>
