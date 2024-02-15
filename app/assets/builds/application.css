@@ -5,6 +5,30 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
 
+ * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.form {
+  margin-top: 200px;
+  display: inline-block;
+}
+
+.form:first-child {
+  width: 400px;
+  margin-left: 250px;
+}
+
+.form:last-child {
+  margin-left: 70px;
+}
+
+.form-control {
+  margin-left: 50px;
+}
+
  .resized-image {
   max-width: 200px; /* 画像の最大幅 */
   max-height: 200px; /* 画像の最大高さ */
