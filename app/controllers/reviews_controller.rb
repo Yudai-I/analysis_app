@@ -7,6 +7,7 @@ require_relative '../services/chat_gpt_service'
 
 class ReviewsController < ApplicationController
     def index
+      @active_nav = :analysis
       @review = Review.new
       @url = params[:url]
       if @url.present?

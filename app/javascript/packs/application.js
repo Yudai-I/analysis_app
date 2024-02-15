@@ -16,3 +16,4 @@
 // const imagePath = (name) => images(name, true)
 
 import "bootstrap";
+require rails-ujs

@@ -7,13 +7,18 @@
     <%= csp_meta_tag %>
     <script src="https://kit.fontawesome.com/a61de98c96.js" crossorigin="anonymous"></script>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_include_tag "turbo", type: "module" %>
   </head>
 
 <body>
 <header>
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-          <a class="navbar-brand" href="/"><span>Amazonレビュー分析</span></a>
+          <a class="navbar-brand" href="/"><% if @active_nav == :top %>
+        <span class="text-yellow">Amazonレビュー分析</span>
+      <% else %>
+        <span>Amazonレビュー分析</span>
+      <% end %></a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
              <span class="navbar-toggler-icon"></span>
           </button>
@@ -22,17 +27,32 @@
       <% if user_signed_in? %>
       <li>
         <%= link_to user_path(current_user.id), class: 'nav-link text-white' do %>
-        <i class="fas fa-home"></i> Mypage
+        <i class="fas fa-home"></i>
+        <% if @active_nav == :mypage %>
+        <span class="text-yellow">Mypage</span>
+      <% else %>
+        <span>Mypage</span>
+      <% end %>
         <% end %>
       </li>
       <li>
         <%= link_to reviews_path, class: 'nav-link text-white' do %>
-        <i class="fa-solid fa-magnifying-glass-chart"></i> Analysis
+        <i class="fa-solid fa-magnifying-glass-chart"></i>
+        <% if @active_nav == :analysis %>
+        <span class="text-yellow">Analysis</span>
+      <% else %>
+        <span>Analysis</span>
+      <% end %>
         <% end %>
       </li>
       <li>
         <%= link_to users_path, class: 'nav-link text-white' do %>
-        <i class="fa-solid fa-users"></i> Recommendation
+        <i class="fa-solid fa-users"></i>
+        <% if @active_nav == :recommendation %>
+        <span class="text-yellow">Recommendation</span>
+      <% else %>
+        <span>Recommendation</span>
+      <% end %>
         <% end %>
       </li>
       <li>
@@ -43,7 +63,12 @@
     <% else %>
     <li>
         <%= link_to root_path, class: 'nav-link text-white' do %>
-        <i class="fas fa-home"></i> Top
+        <i class="fas fa-home"></i>
+        <% if @active_nav == :top %>
+        <span class="text-yellow">Top</span>
+      <% else %>
+        <span>Top</span>
+      <% end %>
         <% end %>
       </li>
       <li>
