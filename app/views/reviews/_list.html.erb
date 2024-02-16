@@ -1,6 +1,9 @@
 <table class="table table-Hoverable">
   <thead>
   <tr>
+  <% if page == "index" %>
+  <th></th>
+  <% end %>
   <th>商品画像</th>
   <th>商品名</th>
   <th>レビュー分析結果</th>
@@ -10,10 +13,15 @@
 <tbody>
   <% reviews.each do |review| %>
   <tr>
+<% if page == "index" and current_user.reviews.include?(review) %>
+<td><i class="fa-solid fa-square-check"></i></td>
+<% elsif page == "index" %>
+<td><i class="fa-regular fa-square-check"></i></td>
+<% end %>
 <td><img src=<%= review.image_url %> alt="画像の説明" class="resized-image"></td>
-<td><%= link_to "#{review.product_name}", "#{review.link}" %></td>
+<td><%= link_to "#{review.product_name}", "#{review.link}", target: :_blank, rel: "noopener noreferrer" %></td>
 <td><%= review.review %></td>
-<% if review.user_id == current_user.id %>
+<% if page != "index" %>
 <td><%= link_to '削除', review_path(review) ,method: :post, 
   data: {
     turbo_method: :delete,

@@ -30,7 +30,7 @@
 <tbody>
 <tr>
 <td><img src="<%= @image_url %>" alt="画像の説明" class="resized-image"></td>
-<td><%= @product %></td>
+<td><%= link_to "#{@product}", "#{@url}", target: :_blank, rel: "noopener noreferrer" %></td>
 <td><%= @ans %></td>
 </tr>
 </tbody>
