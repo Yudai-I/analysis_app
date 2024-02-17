@@ -1,1 +1,1 @@
-<%= render 'reviews/list', reviews: @user.reviews, page: @index %>
+<%= render 'reviews/list', reviews: @user.reviews.page(params[:page]), page: @index %>
