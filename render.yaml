@@ -1,0 +1,21 @@
+databases:
+  - name: analysis_app_DB
+    databaseName: analysis_app_db
+    user: analysis_app
+    region: singapore
+
+services:
+  - type: web
+    name: analysis_app
+    env: ruby
+    region: singapore
+    plan: free
+    buildCommand: "./bin/render-build.sh"
+    startCommand: "bundle exec puma -C config/puma.rb"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: analysis_app_DB
+          property: connectionString
+      - key: RAILS_MASTER_KEY
+        sync: false
