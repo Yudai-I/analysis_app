@@ -16,4 +16,5 @@
 // const imagePath = (name) => images(name, true)
 
 import "bootstrap";
-require rails-ujs
+import "@rails/ujs";
+import "bootstrap/dist/js/bootstrap.bundle";
