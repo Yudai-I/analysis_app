@@ -14,9 +14,35 @@
   <% reviews.each do |review| %>
   <tr>
 <% if page == "index" and current_user.reviews.include?(review) %>
-<td><i class="fa-solid fa-square-check"></i></td>
+<td>
+<i class="fa-solid fa-square-check"></i>
+<% if review.favorited_by?(current_user) %>
+<%= link_to review_favorite_path(review.id), data: {
+    turbo_method: :delete
+} do %>
+<i class="fa-solid fa-heart"></i><%= review.favorites.count %>
+<% end %>
+<% else %>
+<%= link_to review_favorite_path(review.id), data: { "turbo-method": :post } do %>
+<i class="fa-regular fa-heart"></i></i><%= review.favorites.count %>
+<% end %>
+<% end %>
+</td>
 <% elsif page == "index" %>
-<td><i class="fa-regular fa-square-check"></i></td>
+<td>
+<i class="fa-regular fa-square-check"></i>
+<% if review.favorited_by?(current_user) %>
+<%= link_to review_favorite_path(review.id), data: {
+    turbo_method: :delete
+} do %>
+<i class="fa-solid fa-heart"></i><%= review.favorites.count %>
+<% end %>
+<% else %>
+<%= link_to review_favorite_path(review.id), data: { "turbo-method": :post } do %>
+<i class="fa-regular fa-heart"></i><%= review.favorites.count %>
+<% end %>
+<% end %>
+</td>
 <% end %>
 <td><img src=<%= review.image_url %> alt="画像の説明" class="resized-image"></td>
 <td><%= link_to "#{review.product_name}", "#{review.link}", target: :_blank, rel: "noopener noreferrer" %></td>
