@@ -3,10 +3,6 @@
     <%= form_with model: @user, url: user_registration_path, id: 'new_user', class: 'new_user', local: true do |f| %>
     <%= render "devise/shared/error_messages", resource: resource %>
     <h1>新規登録</h1>
-    <div class="box-name">
-      <%= f.label :name, "名前" %><br />
-      <%= f.text_field :name, autofocus: true %>
-    </div>
 
     <div class="box-email">
       <%= f.label :email, "Eメール" %><br />
