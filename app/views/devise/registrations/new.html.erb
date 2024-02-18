@@ -26,13 +26,13 @@
       <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
     </div>
 
-    <div class="field">
-    <%= f.label :age %><br />
+    <div class="box-age">
+    <%= f.label :年代 %><br />
     <%= f.select :age, User.ages.keys %>
   </div>
 
-  <div class="field">
-    <%= f.label :gender %><br />
+  <div class="box-gender">
+    <%= f.label :性別 %><br />
     <%= f.select :gender, User.genders.keys %>
   </div>
 
