@@ -29,9 +29,9 @@
         <%= link_to user_path(current_user.id), class: 'nav-link text-white' do %>
         <i class="fas fa-home"></i>
         <% if @active_nav == :mypage %>
-        <span class="text-yellow">Mypage</span>
+        <span class="text-yellow">マイページ</span>
       <% else %>
-        <span>Mypage</span>
+        <span>マイページ</span>
       <% end %>
         <% end %>
       </li>
@@ -39,9 +39,9 @@
         <%= link_to reviews_path, class: 'nav-link text-white' do %>
         <i class="fa-solid fa-magnifying-glass-chart"></i>
         <% if @active_nav == :analysis %>
-        <span class="text-yellow">Analysis</span>
+        <span class="text-yellow">分析</span>
       <% else %>
-        <span>Analysis</span>
+        <span>分析</span>
       <% end %>
         <% end %>
       </li>
@@ -49,15 +49,15 @@
         <%= link_to users_path, class: 'nav-link text-white' do %>
         <i class="fa-solid fa-users"></i>
         <% if @active_nav == :recommendation %>
-        <span class="text-yellow">Recommendation</span>
+        <span class="text-yellow">レコメンド</span>
       <% else %>
-        <span>Recommendation</span>
+        <span>レコメンド</span>
       <% end %>
         <% end %>
       </li>
       <li>
         <%= link_to destroy_user_session_path, method: :delete, class: 'nav-link text-white' do %>
-        <i class="fas fa-sign-out-alt"></i> Log out
+        <i class="fas fa-sign-out-alt"></i> ログアウト
         <% end %>
       </li>
     <% else %>
@@ -65,20 +65,20 @@
         <%= link_to root_path, class: 'nav-link text-white' do %>
         <i class="fas fa-home"></i>
         <% if @active_nav == :top %>
-        <span class="text-yellow">Top</span>
+        <span class="text-yellow">トップ</span>
       <% else %>
-        <span>Top</span>
+        <span>トップ</span>
       <% end %>
         <% end %>
       </li>
       <li>
         <%= link_to new_user_registration_path, class: 'nav-link text-white' do %>
-        <i class="fas fa-user-plus"></i> Sign up
+        <i class="fas fa-user-plus"></i> 新規登録
         <% end %>
       </li>
       <li>
         <%= link_to new_user_session_path, class: 'nav-link text-white' do %>
-        <i class="fas fa-sign-in-alt"></i> Log in
+        <i class="fas fa-sign-in-alt"></i> ログイン
         <% end %>
       </li>
       <% end %>
