@@ -1,4 +1,4 @@
-# Amazon分析
+# Amazonレビュー分析
 https://analysis-app.onrender.com
 
 ## 概要
@@ -38,6 +38,8 @@ Nokogiri(スクレイピング)
 Devise(認証)
 
 gooラボ API(形態素解析)
+
+ChatGPT API(レビュー分析)
 
 #### デバイス
 * PC・タブレット
