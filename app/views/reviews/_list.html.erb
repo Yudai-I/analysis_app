@@ -19,11 +19,11 @@
 <% if review.favorited_by?(current_user) %>
 <%= link_to review_favorite_path(review.id), data: {
     turbo_method: :delete
-} do %>
+}, class:'link' do %>
 <i class="fa-solid fa-heart"></i><%= review.favorites.count %>
 <% end %>
 <% else %>
-<%= link_to review_favorite_path(review.id), data: { "turbo-method": :post } do %>
+<%= link_to review_favorite_path(review.id), data: { "turbo-method": :post }, class:'link' do %>
 <i class="fa-regular fa-heart"></i></i><%= review.favorites.count %>
 <% end %>
 <% end %>
@@ -34,11 +34,11 @@
 <% if review.favorited_by?(current_user) %>
 <%= link_to review_favorite_path(review.id), data: {
     turbo_method: :delete
-} do %>
+}, class:'link' do %>
 <i class="fa-solid fa-heart"></i><%= review.favorites.count %>
 <% end %>
 <% else %>
-<%= link_to review_favorite_path(review.id), data: { "turbo-method": :post } do %>
+<%= link_to review_favorite_path(review.id), data: { "turbo-method": :post }, class:'link' do %>
 <i class="fa-regular fa-heart"></i><%= review.favorites.count %>
 <% end %>
 <% end %>
