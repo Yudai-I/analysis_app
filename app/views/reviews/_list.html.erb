@@ -45,7 +45,7 @@
 </td>
 <% end %>
 <td><img src=<%= review.image_url %> alt="画像の説明" class="resized-image"></td>
-<td><%= link_to "#{review.product_name}", "#{review.link}", target: :_blank, rel: "noopener noreferrer" %></td>
+<td><%= link_to "#{review.product_name}", "#{review.link}", target: :_blank, rel: "noopener noreferrer", class:'link' %></td>
 <td><%= review.review %></td>
 <% if page != "index" %>
 <td><%= link_to '削除', review_path(review) ,method: :post, 
