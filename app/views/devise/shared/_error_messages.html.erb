@@ -8,6 +8,7 @@
     </h2>
     <ul>
       <% resource.errors.full_messages.each do |message| %>
+      <% message = message.delete("Password").delete("Name") %>
         <li><%= message %></li>
       <% end %>
     </ul>

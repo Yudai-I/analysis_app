@@ -1,4 +1,15 @@
 ja:
+  activerecord:
+    errors:
+      models:
+        user:
+          attributes:
+            password:
+              blank: "パスワードを入力してください"
+            name:
+              blank: "名前を入力してください"
+              taken: "その名前はすでに存在します"
+              too_short: "名前は2文字以上で入力してください"
   devise:
     registrations:
       user:
