@@ -11,15 +11,21 @@ class ReviewsController < ApplicationController
       @review = Review.new
       @url = params[:url]
       if @url.present?
-        user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4691.99 Safari/537.36"
-        @image_url = get_image_url(@url, user_agent)
-        all_views_url = move_to_nexe_page1(@url,user_agent,'#reviews-medley-footer > div.a-row.a-spacing-medium > a')
-        url_for_next_page = move_to_nexe_page1(all_views_url,user_agent,'#cm_cr-pagination_bar > ul > li.a-last > a')
-        @formated_url = remove_unnecessary_literal(url_for_next_page)
+        headers = setting_headers()
+        @image_url = get_image_url(@url, headers)
+        all_views_url = move_to_nexe_page1(@url,headers,'#reviews-medley-footer > div.a-row.a-spacing-medium > a')
+        url_for_next_page = move_to_nexe_page1(all_views_url,headers,'#cm_cr-pagination_bar > ul > li.a-last > a')
+        if url_for_next_page != "nothing"
+          type_of_page = "multiple_pages"
+          @formated_url = remove_unnecessary_literal(url_for_next_page)
+        else
+          type_of_page = "single_page"
+          @formated_url = convert_url(all_views_url)
+        end
       end
 
       if @formated_url.present?
-        @sentence = scrape_data(@formated_url).join
+        @sentence = scrape_data(@formated_url,headers, type_of_page).join
         @api = get_morphological_analysis(@sentence)
         # joinする文字数はいったん600(長すぎるとエラー)
         @api = remove_hiragana_emoji_symbol_words(@api).join[0,600]
@@ -63,6 +69,10 @@ class ReviewsController < ApplicationController
       return url.gsub("&reviewerType=all_reviews", "")
     end
 
+    def convert_url(url)
+      return url.gsub("ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews", "ref=cm_cr_arp_d_paging_btm_next_2?ie=UTF8&reviewerType=all_reviews&pageNumber=1")
+    end
+
     # 次のページに遷移するために必要なメソッド
     def formatting_url(url, n)
       url.sub(/pageNumber=\d+/, "pageNumber=#{n}")
@@ -86,32 +96,32 @@ class ReviewsController < ApplicationController
     end
     
     # 商品によって、cssセレクタが違うことがあるので、それの対処用で複数の類似メソッドを作成
-    def move_to_nexe_page1(url,user_agent,selector)
-      html = URI.open(url, "User-Agent" => user_agent).read
+    def move_to_nexe_page1(url,headers,selector)
+      html = URI.open(url, headers).read
       doc = Nokogiri::HTML(html)
       begin
         link = doc.css(selector).attr('href').value
         proper_link = "https://www.amazon.co.jp/#{link}"
       rescue OpenURI::HTTPError,StandardError,Timeout::Error => e
-        proper_link = move_to_nexe_page2(url,'#cr-pagination-footer-0 > a')
+        proper_link = move_to_nexe_page2(url,headers,'#cr-pagination-footer-0 > a')
       end
       return proper_link
     end
 
-    def move_to_nexe_page2(url,user_agent,selector)
-      html = URI.open(url, "User-Agent" => user_agent).read
+    def move_to_nexe_page2(url,headers,selector)
+      html = URI.open(url, headers).read
       doc = Nokogiri::HTML(html)
       begin
         link = doc.css(selector).attr('href').value
         proper_link = "https://www.amazon.co.jp/#{link}"
       rescue OpenURI::HTTPError,StandardError,Timeout::Error => e
-        proper_link = move_to_nexe_page3(url,'#cm_cr-pagination_bar > ul > li.a-last > a')
+        proper_link = move_to_nexe_page3(url,headers,'#cm_cr-pagination_bar > ul > li.a-last > a')
       end
       return proper_link
     end
 
-    def move_to_nexe_page3(url,user_agent,selector)
-      html = URI.open(url, "User-Agent" => user_agent).read
+    def move_to_nexe_page3(url,headers,selector)
+      html = URI.open(url, headers).read
       doc = Nokogiri::HTML(html)
       begin
         link = doc.css(selector).attr('href').value
@@ -122,9 +132,9 @@ class ReviewsController < ApplicationController
       return proper_link
     end
 
-    def get_image_url(url,user_agent)
+    def get_image_url(url,headers)
       begin
-        html = URI.open(url, "User-Agent" => user_agent).read
+        html = URI.open(url, headers).read
         doc = Nokogiri::HTML(html)
         image_tag = doc.at_css('#imgTagWrapperId img')
         image_url = image_tag['src'] if image_tag
@@ -135,14 +145,13 @@ class ReviewsController < ApplicationController
     end
 
     #レビュー文１つ１つを要素とした１次元配列を返す
-    def scrape_data(url)
+    def scrape_data(url,headers,type_of_page)
       @contents = []
       n = 1
-      user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.115 Safari/537.3"
       while true do
-        formated_url = formatting_url(url, n)
+        url = formatting_url(url, n)
         begin
-          html = URI.open(formated_url, "User-Agent" => user_agent).read
+          html = URI.open(url, headers).read
           doc = Nokogiri::HTML.parse(html)
           reviews = doc.css('div.a-row.a-spacing-small.review-data')
           break if reviews.empty?
@@ -175,6 +184,37 @@ class ReviewsController < ApplicationController
       word_list = result['word_list']
       #flattenは2次元配列を1次元配列にするメソッド(データを扱いやすいように)
       return word_list.flatten
+    end
+
+    def setting_headers
+      user_agents = [
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36 OPR/77.0.4054.254',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:90.0) Gecko/20100101 Firefox/90.0',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36 Edg/92.0.902.55',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36 OPR/77.0.4054.254',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:90.0) Gecko/20100101 Firefox/90.0',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36 Edg/92.0.902.55',
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36',
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36 OPR/77.0.4054.254'
+  ]
+
+      referrers = [
+    'https://narou-osusume.com/osusumes/2',
+    'https://narou-osusume.com/osusumes/10',
+    'https://narou-osusume.com/osusumes/15'
+  ]
+      wait_times = [0.3, 0.5, 0.7, 1, 1.2]
+      wait_time = wait_times.sample
+      sleep(wait_time)
+      user_agent = user_agents.sample
+      referrer = referrers.sample
+      headers = {
+    'User-Agent' => user_agent,
+    'Referer' => referrer
+  }
+      return headers
     end
 
 end
