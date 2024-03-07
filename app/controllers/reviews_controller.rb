@@ -205,9 +205,7 @@ class ReviewsController < ApplicationController
     'https://narou-osusume.com/osusumes/10',
     'https://narou-osusume.com/osusumes/15'
   ]
-      wait_times = [0.3, 0.5, 0.7, 1, 1.2]
-      wait_time = wait_times.sample
-      sleep(wait_time)
+      
       user_agent = user_agents.sample
       referrer = referrers.sample
       headers = {
