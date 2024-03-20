@@ -29,6 +29,9 @@ class ReviewsController < ApplicationController
         if @sentence.nil?
           @sentence = scrape_data(@formated_url,headers, type_of_page).join
         end
+        if @sentence.nil?
+          @sentence = scrape_data(@formated_url,headers, type_of_page).join
+        end
         @api = get_morphological_analysis(@sentence)
         # joinする文字数はいったん600(長すぎるとエラー)
         @api = remove_hiragana_emoji_symbol_words(@api).join[0,600]
