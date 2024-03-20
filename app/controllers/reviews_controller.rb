@@ -26,6 +26,9 @@ class ReviewsController < ApplicationController
 
       if @formated_url.present?
         @sentence = scrape_data(@formated_url,headers, type_of_page).join
+        if @sentence.nil?
+          @sentence = scrape_data(@formated_url,headers, type_of_page).join
+        end
         @api = get_morphological_analysis(@sentence)
         # joinする文字数はいったん600(長すぎるとエラー)
         @api = remove_hiragana_emoji_symbol_words(@api).join[0,600]
@@ -181,9 +184,13 @@ class ReviewsController < ApplicationController
 
       response = Net::HTTP.post(url, body.to_json, 'Content-Type' => 'application/json')
       result = JSON.parse(response.body)
-      word_list = result['word_list']
-      #flattenは2次元配列を1次元配列にするメソッド(データを扱いやすいように)
-      return word_list.flatten
+      if result['word_list'].nil?
+        word_list = ["レビュー","なし"]
+      else
+        word_list = result['word_list'].flatten
+      end
+      
+      return word_list
     end
 
     def setting_headers
