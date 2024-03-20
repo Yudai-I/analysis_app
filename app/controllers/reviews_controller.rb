@@ -32,9 +32,13 @@ class ReviewsController < ApplicationController
         @api = get_morphological_analysis(@sentence)
         # joinする文字数はいったん600(長すぎるとエラー)
         @api = remove_hiragana_emoji_symbol_words(@api).join[0,600]
-        prompt = "下記のレビューにおいて、ユーザーがよかった思うこと、失敗したことは何か説明して##{@api}"
-        chatgpt = ChatGptService.new
-        @ans = chatgpt.chat(prompt)
+        if @api.nil?
+          @ans = "分析に失敗しました。もう一度分析してください。"
+        else
+          prompt = "下記のレビューにおいて、ユーザーがよかった思うこと、失敗したことは何か説明して##{@api}"
+          chatgpt = ChatGptService.new
+          @ans = chatgpt.chat(prompt)
+        end
         @product = extract_product_name(@formated_url)
       end
     end
@@ -189,7 +193,7 @@ class ReviewsController < ApplicationController
       else
         word_list = result['word_list'].flatten
       end
-      
+
       return word_list
     end
 
