@@ -190,6 +190,12 @@ class ReviewsController < ApplicationController
       }
 
       response = Net::HTTP.post(url, body.to_json, 'Content-Type' => 'application/json')
+      time = 0
+      while response == true or time <= 20 do
+        sleep 1
+        time += 1
+      end
+
       result = JSON.parse(response.body)
       if result['word_list'].nil?
         word_list = ["レビュー","なし"]
