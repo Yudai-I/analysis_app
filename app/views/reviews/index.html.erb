@@ -1,4 +1,5 @@
 <%= flash[:notice] %>
+<%= @sentence %>
 <div class="form-container">
   <div class="form">
 
@@ -17,7 +18,7 @@
 
   </div>
 </div>
-
+<%= @api %>
 <div class="result">
 <% if @ans.present? %>
 <table class="table table-Hoverable">
