@@ -78,18 +78,15 @@ class ReviewsController < ApplicationController
 
     def remove_unnecessary_literal(url)
       url = url.gsub("&reviewerType=all_reviews", "")
-      url = url.gsub("https://www.amazon.co.jp/https://www.amazon.jp","https://www.amazon.co.jp")
     end
 
     def convert_url(url)
       url = url.gsub("ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews", "ref=cm_cr_arp_d_paging_btm_next_2?ie=UTF8&reviewerType=all_reviews&pageNumber=1")
-      url = url.gsub("https://www.amazon.co.jp/https://www.amazon.jp","https://www.amazon.co.jp")
     end
 
     # 次のページに遷移するために必要なメソッド
     def formatting_url(url, n)
       url = url.sub(/pageNumber=\d+/, "pageNumber=#{n}")
-      url = url.gsub("https://www.amazon.co.jp/https://www.amazon.jp","https://www.amazon.co.jp")
     end
 
     # ユーザーが入力したurlから商品名を抜き出すメソッド
