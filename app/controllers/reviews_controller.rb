@@ -168,7 +168,7 @@ class ReviewsController < ApplicationController
           @contents.concat(reviews)
           n += 1
         rescue OpenURI::HTTPError,StandardError,Timeout::Error => e
-          @error = e
+          @error = [e,url]
           break
         end
       end
