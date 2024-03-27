@@ -168,11 +168,13 @@ class ReviewsController < ApplicationController
           @contents.concat(reviews)
           n += 1
         rescue OpenURI::HTTPError,StandardError,Timeout::Error => e
+          @error = e
           break
         end
       end
       @contents.map! { |html| strip_html_tags(html) }
       return @contents
+      return @error if @error
     end
 
     #形態素解析し得た文字列を要素とする1次元配列を返す
