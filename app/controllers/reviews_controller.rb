@@ -87,7 +87,8 @@ class ReviewsController < ApplicationController
 
     # 次のページに遷移するために必要なメソッド
     def formatting_url(url, n)
-      url.sub(/pageNumber=\d+/, "pageNumber=#{n}")
+      url = url.sub(/pageNumber=\d+/, "pageNumber=#{n}")
+      url = url.gsub("https://www.amazon.co.jp/https://www.amazon.jp","https://www.amazon.co.jp")
     end
 
     # ユーザーが入力したurlから商品名を抜き出すメソッド
