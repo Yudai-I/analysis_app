@@ -16,22 +16,16 @@ class ReviewsController < ApplicationController
         all_views_url = get_all_views_link(@url,headers,'#reviews-medley-footer > div.a-row.a-spacing-medium > a')
         url_for_next_page = get_next_page_link(all_views_url,headers,'#cm_cr-pagination_bar > ul > li.a-last > a')
         if url_for_next_page != "nothing"
-          type_of_page = "multiple_pages"
+          type_of_page = "multiple"
           @formated_url = remove_unnecessary_literal(url_for_next_page)
         else
-          type_of_page = "single_page"
+          type_of_page = "single"
           @formated_url = convert_url(all_views_url)
         end
       end
 
       if @formated_url.present?
         @sentence = scrape_data(@formated_url,headers, type_of_page).join
-        if @sentence.nil?
-          @sentence = scrape_data(@formated_url,headers, type_of_page).join
-        end
-        if @sentence.nil?
-          @sentence = scrape_data(@formated_url,headers, type_of_page).join
-        end
         @api = get_morphological_analysis(@sentence)
         # joinする文字数はいったん600(長すぎるとエラー)
         @api = remove_hiragana_emoji_symbol_words(@api).join[0,600]
@@ -116,7 +110,7 @@ class ReviewsController < ApplicationController
         begin
           proper_link = get_all_views_link(url,headers,'#cr-pagination-footer-0 > a')
         rescue OpenURI::HTTPError,StandardError,Timeout::Error => e
-          proper_link = "invalid link"
+          proper_link = "nothing"
         end
       end
 
@@ -131,9 +125,9 @@ class ReviewsController < ApplicationController
         proper_link = "https://www.amazon.co.jp/#{link}"
       rescue OpenURI::HTTPError,StandardError,Timeout::Error => e
       # レビュー数が少ないと「次へ」ボタンがない場合がある。そのままだとエラーが起こるので、その場合は代わりにレビューの1ページ目を格納するようにする
-        proper_link = get_all_views_link(url,headers,'#cm_cr-pagination_bar > ul > li.a-last > a')
+        proper_link = "nothing"
       end
-      
+
       return proper_link
     end
 
