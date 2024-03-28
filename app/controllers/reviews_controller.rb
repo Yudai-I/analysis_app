@@ -105,7 +105,6 @@ class ReviewsController < ApplicationController
       end
     end
     
-    # 商品によって、cssセレクタが違うことがあるので、それの対処用で複数の類似メソッドを作成
     def get_all_views_link(url,headers,selector)
       html = URI.open(url, headers).read
       doc = Nokogiri::HTML(html)
@@ -113,6 +112,7 @@ class ReviewsController < ApplicationController
         link = doc.css(selector).attr('href').value
         proper_link = "https://www.amazon.co.jp/#{link}"
       rescue OpenURI::HTTPError,StandardError,Timeout::Error => e
+      # 商品によっては「レビューをすべて見る」ボタンのセレクタが「reviews-medley-footer > div.a-row.a-spacing-medium > a」ではなく「cr-pagination-footer-0 > a」の場合があるので例外処理
         begin
           proper_link = get_all_views_link(url,headers,'#cr-pagination-footer-0 > a')
         rescue OpenURI::HTTPError,StandardError,Timeout::Error => e
@@ -130,6 +130,7 @@ class ReviewsController < ApplicationController
         link = doc.css(selector).attr('href').value
         proper_link = "https://www.amazon.co.jp/#{link}"
       rescue OpenURI::HTTPError,StandardError,Timeout::Error => e
+      # レビュー数が少ないと「次へ」ボタンがない場合がある。そのままだとエラーが起こるので、その場合は代わりにレビューの1ページ目を格納するようにする
         proper_link = get_all_views_link(url,headers,'#cm_cr-pagination_bar > ul > li.a-last > a')
       end
       return proper_link
