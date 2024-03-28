@@ -12,7 +12,6 @@ class ReviewsController < ApplicationController
       @url = params[:url]
       if @url.present?
         headers = setting_headers()
-        @headers = headers
         @image_url = get_image_url(@url, headers)
         all_views_url = move_to_nexe_page1(@url,headers,'#reviews-medley-footer > div.a-row.a-spacing-medium > a')
         url_for_next_page = move_to_nexe_page1(all_views_url,headers,'#cm_cr-pagination_bar > ul > li.a-last > a')
