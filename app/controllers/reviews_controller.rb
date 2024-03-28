@@ -13,8 +13,8 @@ class ReviewsController < ApplicationController
       if @url.present?
         headers = setting_headers()
         @image_url = get_image_url(@url, headers)
-        all_views_url = move_to_nexe_page1(@url,headers,'#reviews-medley-footer > div.a-row.a-spacing-medium > a')
-        url_for_next_page = move_to_nexe_page1(all_views_url,headers,'#cm_cr-pagination_bar > ul > li.a-last > a')
+        all_views_url = get_all_views_link(@url,headers,'#reviews-medley-footer > div.a-row.a-spacing-medium > a')
+        url_for_next_page = get_next_page_link(all_views_url,headers,'#cm_cr-pagination_bar > ul > li.a-last > a')
         if url_for_next_page != "nothing"
           type_of_page = "multiple_pages"
           @formated_url = remove_unnecessary_literal(url_for_next_page)
@@ -106,26 +106,31 @@ class ReviewsController < ApplicationController
     end
     
     # 商品によって、cssセレクタが違うことがあるので、それの対処用で複数の類似メソッドを作成
-    def move_to_nexe_page1(url,headers,selector)
+    def get_all_views_link(url,headers,selector)
       html = URI.open(url, headers).read
       doc = Nokogiri::HTML(html)
       begin
         link = doc.css(selector).attr('href').value
         proper_link = "https://www.amazon.co.jp/#{link}"
       rescue OpenURI::HTTPError,StandardError,Timeout::Error => e
-        proper_link = move_to_nexe_page2(url,headers,'#cr-pagination-footer-0 > a')
+        begin
+          proper_link = get_all_views_link(url,headers,'#cr-pagination-footer-0 > a')
+        rescue OpenURI::HTTPError,StandardError,Timeout::Error => e
+          proper_link = "invalid link"
+        end
       end
+
       return proper_link
     end
 
-    def move_to_nexe_page2(url,headers,selector)
+    def get_next_page_link(url,headers,selector)
       html = URI.open(url, headers).read
       doc = Nokogiri::HTML(html)
       begin
         link = doc.css(selector).attr('href').value
         proper_link = "https://www.amazon.co.jp/#{link}"
       rescue OpenURI::HTTPError,StandardError,Timeout::Error => e
-        proper_link = move_to_nexe_page3(url,headers,'#cm_cr-pagination_bar > ul > li.a-last > a')
+        proper_link = get_all_views_link(url,headers,'#cm_cr-pagination_bar > ul > li.a-last > a')
       end
       return proper_link
     end
