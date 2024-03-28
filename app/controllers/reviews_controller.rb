@@ -133,18 +133,7 @@ class ReviewsController < ApplicationController
       # レビュー数が少ないと「次へ」ボタンがない場合がある。そのままだとエラーが起こるので、その場合は代わりにレビューの1ページ目を格納するようにする
         proper_link = get_all_views_link(url,headers,'#cm_cr-pagination_bar > ul > li.a-last > a')
       end
-      return proper_link
-    end
-
-    def move_to_nexe_page3(url,headers,selector)
-      html = URI.open(url, headers).read
-      doc = Nokogiri::HTML(html)
-      begin
-        link = doc.css(selector).attr('href').value
-        proper_link = "https://www.amazon.co.jp/#{link}"
-      rescue OpenURI::HTTPError,StandardError,Timeout::Error => e
-        proper_link = "nothing"
-      end
+      
       return proper_link
     end
 
