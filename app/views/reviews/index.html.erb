@@ -6,12 +6,12 @@
       <%= render 'homes/instruction' %>
     </div>
 
-    <%= form_with url: reviews_path, local: true, method: :get, class: "form-inline" do |f| %>
+    <%= form_with url: get_result_analysis_path, local: true, method: :post, class: "form-inline" do |f| %>
       <div class="form-group">
         <%= f.text_field :url, class: "form-control", placeholder: "URLを入力してください" %>
       </div>
       <div class="form-group">
-        <%= f.submit "分析する", class: "btn btn-outline-dark btn-block btn-lg" %>
+        <%= f.submit "分析する", class: "btn btn-outline-dark btn-block btn-lg", data: { turbo: false } %>
       </div>
     <% end %>
 

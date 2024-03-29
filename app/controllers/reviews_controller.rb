@@ -9,35 +9,17 @@ class ReviewsController < ApplicationController
     def index
       @active_nav = :analysis
       @review = Review.new
-      @url = params[:url]
-      if @url.present?
-        headers = setting_headers()
-        @image_url = get_image_url(@url, headers)
-        all_views_url = get_all_views_link(@url,headers,'#reviews-medley-footer > div.a-row.a-spacing-medium > a')
-        url_for_next_page = get_next_page_link(all_views_url,headers,'#cm_cr-pagination_bar > ul > li.a-last > a')
-        if url_for_next_page != "nothing"
-          type_of_page = "multiple"
-          @formated_url = remove_unnecessary_literal(url_for_next_page)
-        else
-          type_of_page = "single"
-          @formated_url = convert_url(all_views_url)
-        end
-      end
+    end
 
-      if @formated_url.present?
-        @sentence = scrape_data(@formated_url,headers, type_of_page).join
-        @api = get_morphological_analysis(@sentence)
-        # joinする文字数はいったん600(長すぎるとエラー)
-        @api = remove_hiragana_emoji_symbol_words(@api).join[0,600]
-        if @api.nil?
-          @ans = "分析に失敗しました。もう一度分析してください。"
-        else
-          prompt = "下記のレビューにおいて、ユーザーがよかった思うこと、失敗したことは何か説明して##{@api}"
-          chatgpt = ChatGptService.new
-          @ans = chatgpt.chat(prompt)
-        end
-        @product = extract_product_name(@formated_url)
-      end
+    def get_result_analysis
+      @url = params[:url]
+      result = get_result(@url)
+      @ans = result[0]
+      @image_url = result[1]
+      @product = result[2]
+      @active_nav = :analysis
+      @review = Review.new
+      render :index
     end
 
     def create
@@ -56,13 +38,42 @@ class ReviewsController < ApplicationController
       redirect_to reviews_path
     end
 
-    private
+    def get_result(url)
+      if url.present?
+        headers = setting_headers()
+        image_url = get_image_url(url, headers)
+        all_views_url = get_all_views_link(url,headers,'#reviews-medley-footer > div.a-row.a-spacing-medium > a')
+        url_for_next_page = get_next_page_link(all_views_url,headers,'#cm_cr-pagination_bar > ul > li.a-last > a')
+        if url_for_next_page != "nothing"
+          type_of_page = "multiple"
+          formated_url = remove_unnecessary_literal(url_for_next_page)
+        else
+          type_of_page = "single"
+          formated_url = convert_url(all_views_url)
+        end
+      end
 
-    def review_params
-      params.require(:review).permit(:review, :link, :product_name, :image_url)
+      if formated_url.present?
+        sentence = scrape_data(formated_url,headers, type_of_page).join
+        api = get_morphological_analysis(sentence)
+        # joinする文字数はいったん600(長すぎるとエラー)
+        api = remove_hiragana_emoji_symbol_words(api).join[0,600]
+        if api.nil?
+          ans = "分析に失敗しました。もう一度分析してください。"
+        else
+          prompt = "下記のレビューにおいて、ユーザーがよかった思うこと、失敗したことは何か説明して##{api}"
+          chatgpt = ChatGptService.new
+          ans = chatgpt.chat(prompt)
+        end
+        product = extract_product_name(formated_url)
+      end
+      return [ans, image_url, product]
     end
 
     private
+    def review_params
+      params.require(:review).permit(:review, :link, :product_name, :image_url)
+    end
 
     # HTMLタグを取り除いてテキストに変換する関数
     def strip_html_tags(html)
@@ -113,7 +124,6 @@ class ReviewsController < ApplicationController
           proper_link = "nothing"
         end
       end
-
       return proper_link
     end
 
@@ -138,7 +148,7 @@ class ReviewsController < ApplicationController
         image_tag = doc.at_css('#imgTagWrapperId img')
         image_url = image_tag['src'] if image_tag
       rescue OpenURI::HTTPError,StandardError,Timeout::Error => e
-        image_url = nil
+        image_url = "nothing"
       end
       return image_url
     end
